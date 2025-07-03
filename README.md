@@ -23,7 +23,8 @@ This project contains an n8n workflow that automates job application tracking by
 ## Screenshots
 
 ![image](https://github.com/user-attachments/assets/2b048c71-04f1-4e5d-b787-e590d6344a8b)
-![image](https://github.com/user-attachments/assets/5ea22ccf-093a-4498-aa9b-456ec82d5b83)
+![image](https://github.com/user-attachments/assets/8574b858-37e8-443f-8f73-b56467e26b77)
+
 
 
 
