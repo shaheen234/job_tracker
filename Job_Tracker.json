@@ -1,0 +1,362 @@
+{
+  "name": "Job_Tracker",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 14
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        60,
+        20
+      ],
+      "id": "897c2953-3bfb-4859-9345-a04ffb1dee7a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1oRP3Zjntcn0JNftotBJcOdR9xVqQk_5mtsLvGBxgGw8/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Company Name": "={{ $json['Company Name'] }}",
+            "Interview Date": "={{ $json['Interview Date'] }}",
+            "Status": "={{ $json.Status }}",
+            "Position Applied": "={{ $json['Position Applied'] }}",
+            "Test Date": "={{ $json['Test Date'] }}",
+            "Date": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "Company Name"
+          ],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Position Applied",
+              "displayName": "Position Applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Interview Date",
+              "displayName": "Interview Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Test Date",
+              "displayName": "Test Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1316,
+        20
+      ],
+      "id": "74ce7351-aac0-427e-b7b1-abc509e52228",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "J0rj3DueA62CDqoa",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 1,
+        "filters": {
+          "labelIds": [
+            "INBOX",
+            "IMPORTANT"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        280,
+        20
+      ],
+      "id": "fd2be7e1-f06f-41c1-93bb-4c3af53b2248",
+      "name": "Gmail",
+      "webhookId": "492c415a-4789-4398-a3b7-fc7a226d9c53",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "oKwfiP2hc3Ej85MO",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "Extract the following from this email:\n\n1. Basic Information:\n   - Sender, subject, date\n   - Main topic/purpose\n   - Company Name\n\n\n2. Sentiment Keywords - identify and list any of these types of words:\n   - Negative: unfortunately, sorry, cannot, unable, declined, rejected, failed, issue, problem, delay, cancel\n   - Positive: pleased, happy, approved, accepted, successful, congratulations, opportunity, offer, benefit\n   - Neutral/Business: regarding, concerning, update, information, request\n\nif interview date map it to Interview date on spreadsheet\n",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Company Name",
+              "description": "={{ $json.snippet }}"
+            },
+            {
+              "name": "Interview Date",
+              "type": "date",
+              "description": "={{ $json.snippet }}"
+            },
+            {
+              "name": "Status",
+              "description": "={{ $json.snippet }}"
+            },
+            {
+              "name": "Position Applied",
+              "description": "={{ $json.snippet }}"
+            },
+            {
+              "name": "Test Date",
+              "type": "date",
+              "description": "={{ $json.snippet }}"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You are an expert extraction algorithm.\nOnly extract relevant information from the text.\nIf you do not know the value of an attribute asked to extract, you may omit the attribute's value.\n",
+          "batching": {}
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        500,
+        20
+      ],
+      "id": "621bd534-042a-4883-a9f5-0d9994e22db7",
+      "name": "Information Extractor",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        588,
+        240
+      ],
+      "id": "9b0bf62f-b126-49dd-a22e-8ee0bdb68957",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "wz73F0f05MG1N4qO",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// All rows from Google Sheets node\nconst sheetRows = items;\n// Info to check, from Information Extractor node\nconst infoToCheck = $node[\"Information Extractor\"].json.output;\n\n// Fields for identity and update\nconst updateFields = [\"Status\", \"Test Date\", \"Interview Date\"];\n\n// Find matching row index\nlet foundRow = null;\nlet foundIndex = -1;\nfor (let i = 0; i < sheetRows.length; i++) {\n  const row = sheetRows[i].json;\n  if (\n    row[\"Company Name\"] === infoToCheck[\"Company Name\"] &&\n    row[\"Position Applied\"] === infoToCheck[\"Position Applied\"]\n  ) {\n    foundRow = row;\n    foundIndex = i;\n    break;\n  }\n}\n\nif (!foundRow) {\n  // Not found: for append\n  return [{ json: { ...infoToCheck, _action: \"append\" } }];\n}\n\n// Found: check if update is needed\nlet updateNeeded = false;\nlet updatedFields = {};\nfor (let i = 0; i < updateFields.length; i++) {\n  let field = updateFields[i];\n  if (\n    infoToCheck[field] !== undefined &&\n    foundRow[field] !== infoToCheck[field]\n  ) {\n    updateNeeded = true;\n    updatedFields[field] = {\n      old: foundRow[field],\n      new: infoToCheck[field]\n    };\n  }\n}\nif (updateNeeded) {\n  // Return info for update (include row index for reference)\n  return [{\n    json: {\n      ...infoToCheck,\n      _action: \"update\",\n      _rowIndex: foundIndex + 2, // 1-based, +1 for header row\n      _updatedFields: updatedFields\n    }\n  }];\n}\n\n// Exists and up-to-date: no action\nreturn [];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1096,
+        20
+      ],
+      "id": "ce86829c-8e82-47be-aa16-acf62ef626fb",
+      "name": "Code",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1oRP3Zjntcn0JNftotBJcOdR9xVqQk_5mtsLvGBxgGw8/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        876,
+        20
+      ],
+      "id": "5db475e7-963c-4d29-a5cd-bcf80ecc9cf7",
+      "name": "Google Sheets1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "J0rj3DueA62CDqoa",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        []
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e5f4e5e7-a562-4a4e-8ff3-018910a9951e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0d66d3ad221c33bac9acfe319255cf1aa6cfb7802c241c5df9b063e2be172b8c"
+  },
+  "id": "noloL7L87ZRPENYa",
+  "tags": []
+}
