@@ -9,7 +9,7 @@ This project contains an n8n workflow that automates job application tracking by
 - Uses custom logic in n8n’s code nodes for data validation.
 
 ## How to Use
-1. Import the `job-tracker-workflow.json` file into your n8n instance.
+1. Import the `job_tracker.json` file into your n8n instance.
 2. Set up credentials for Gmail, Gemini and Google Sheets.
 3. Update sheet and field mappings as per your own Google Sheet.
 4. Activate and test the workflow.
